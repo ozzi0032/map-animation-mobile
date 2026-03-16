@@ -1,33 +1,67 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
-
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Text } from 'react-native';
+import { Colors } from '../../src/constants/colors';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
+        tabBarStyle: {
+          backgroundColor: Colors.surface,
+          borderTopColor: Colors.border,
+          borderTopWidth: 1,
+          height: 60,
+          paddingBottom: 8,
+        },
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.textMuted,
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '500' },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarLabel: 'Templates',
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 20, color }}>🗺️</Text>
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="create"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarLabel: 'Create',
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 20, color }}>✨</Text>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="projects"
+        options={{
+          tabBarLabel: 'Projects',
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 20, color }}>📁</Text>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="queue"
+        options={{
+          tabBarLabel: 'Queue',
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 20, color }}>⏳</Text>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          tabBarLabel: 'Profile',
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 20, color }}>👤</Text>
+          ),
         }}
       />
     </Tabs>

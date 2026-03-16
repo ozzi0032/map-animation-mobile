@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../../src/constants/colors';
 
-export default function HomeScreen() {
+export default function QueueScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>🗺️ Templates — Coming in Iteration 2</Text>
+      <Text style={styles.text}>⏳ Queue — Coming in Iteration 4</Text>
     </View>
   );
 }
