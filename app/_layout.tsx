@@ -19,7 +19,7 @@ function AuthGuard() {
     if (!isAuthenticated && inTabsGroup) {
       router.replace('/(auth)/login');
     } else if (isAuthenticated && inAuthGroup) {
-      router.replace('/(tabs)');
+      router.replace('/(tabs)/create');
     }
   }, [isAuthenticated, isInitialized, segments]);
 
@@ -29,7 +29,7 @@ function AuthGuard() {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <StatusBar style="light" backgroundColor="#0A0E1A" />
+      <StatusBar style="light" backgroundColor="#070913" />
       <AuthGuard />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
