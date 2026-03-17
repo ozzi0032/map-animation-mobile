@@ -34,7 +34,7 @@ const PAGE_SIZE = 20;
 
 export default function TemplatesScreen() {
   const router = useRouter();
-  const { setPendingPrompt, recordView } = useTemplateStore();
+  const { setPendingPrompt, recordView, viewDeltas, useDeltas, getLikeState } = useTemplateStore();
 
   // Filter / search
   const [activeFilter, setActiveFilter] = useState<TemplateListParams['filterType']>('all');
@@ -111,8 +111,9 @@ export default function TemplatesScreen() {
     }
   };
 
-  // ── Tap template card ── (view is recorded inside TemplateDetailModal on open)
+  // ── Tap template card ──
   const handleCardTap = (item: TemplateItem) => {
+    recordView(item.id);
     setModalTemplate(item);
     setModalVisible(true);
   };
@@ -131,6 +132,9 @@ export default function TemplatesScreen() {
   const renderItem = useCallback(
     ({ item, index }: { item: TemplateItem; index: number }) => {
       const isLeft = index % 2 === 0;
+      const effectiveView = item.viewCounter + (viewDeltas[item.id] ?? 0);
+      const effectiveUse = item.usedCounter + (useDeltas[item.id] ?? 0);
+      const { likedCount } = getLikeState(item.id, item.isLikedByCurrentUser, item.likedCounter);
       return (
         <TouchableOpacity
           style={[styles.card, isLeft ? { marginRight: CARD_GAP / 2 } : { marginLeft: CARD_GAP / 2 }]}
@@ -170,15 +174,15 @@ export default function TemplatesScreen() {
               {item.title}
             </Text>
             <View style={styles.cardStatsRow}>
-              <Text style={styles.cardStat}>👁 {formatCount(item.viewCounter)}</Text>
-              <Text style={styles.cardStat}>▶ {formatCount(item.usedCounter)}</Text>
-              <Text style={styles.cardStat}>❤ {formatCount(item.likedCounter)}</Text>
+              <Text style={styles.cardStat}>👁 {formatCount(effectiveView)}</Text>
+              <Text style={styles.cardStat}>▶ {formatCount(effectiveUse)}</Text>
+              <Text style={styles.cardStat}>❤ {formatCount(likedCount)}</Text>
             </View>
           </View>
         </TouchableOpacity>
       );
     },
-    []
+    [viewDeltas, useDeltas, getLikeState]
   );
 
   const ListEmptyComponent = loading ? null : (
@@ -267,6 +271,7 @@ export default function TemplatesScreen() {
           data={items}
           keyExtractor={(item) => String(item.id)}
           numColumns={2}
+          extraData={{ viewDeltas, useDeltas }}
           renderItem={renderItem}
           contentContainerStyle={styles.grid}
           columnWrapperStyle={styles.gridRow}

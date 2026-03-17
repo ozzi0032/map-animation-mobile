@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { templateApi, type FeaturedTemplate, type TemplateItem } from '../api/templateApi';
+import { templateApi, type FeaturedTemplate } from '../api/templateApi';
 
 interface LikeState {
   isLiked: boolean;
@@ -15,6 +15,10 @@ interface TemplateStore {
   // ── Optimistic like states keyed by template id ──
   likeStates: Record<number, LikeState>;
 
+  // ── Optimistic counter deltas keyed by template id ──
+  viewDeltas: Record<number, number>;
+  useDeltas: Record<number, number>;
+
   // ── Cross-tab pending prompt (Templates → Create) ──
   pendingPrompt: string | null;
   pendingTemplateId: number | null;
@@ -23,12 +27,17 @@ interface TemplateStore {
   loadFeatured: () => Promise<void>;
   toggleLike: (id: number, currentIsLiked: boolean, currentCount: number) => Promise<void>;
   recordView: (id: number) => void;
+  /** Update local viewDelta only — use when the server already recorded the view (e.g. via GET detail) */
+  bumpViewDelta: (id: number) => void;
+  /** Reset view/use deltas for a template — call before applying fresh getDetail data so stale deltas don't stack on a new base */
+  resetDeltas: (id: number) => void;
   recordUse: (id: number) => void;
   setPendingPrompt: (prompt: string, templateId: number) => void;
   clearPendingPrompt: () => void;
 
-  // ── Like state helpers ──
+  // ── State helpers ──
   getLikeState: (id: number, fallbackIsLiked: boolean, fallbackCount: number) => LikeState;
+  getCounters: (id: number, baseView: number, baseUse: number) => { viewCounter: number; usedCounter: number };
 }
 
 export const useTemplateStore = create<TemplateStore>((set, get) => ({
@@ -36,6 +45,8 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
   featuredLoading: false,
   featuredError: null,
   likeStates: {},
+  viewDeltas: {},
+  useDeltas: {},
   pendingPrompt: null,
   pendingTemplateId: null,
 
@@ -85,10 +96,32 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
   },
 
   recordView: (id) => {
+    set((state) => ({
+      viewDeltas: { ...state.viewDeltas, [id]: (state.viewDeltas[id] ?? 0) + 1 },
+    }));
     templateApi.recordView(id).catch(() => {});
   },
 
+  bumpViewDelta: (id) => {
+    set((state) => ({
+      viewDeltas: { ...state.viewDeltas, [id]: (state.viewDeltas[id] ?? 0) + 1 },
+    }));
+  },
+
+  resetDeltas: (id) => {
+    set((state) => {
+      const viewDeltas = { ...state.viewDeltas };
+      const useDeltas = { ...state.useDeltas };
+      delete viewDeltas[id];
+      delete useDeltas[id];
+      return { viewDeltas, useDeltas };
+    });
+  },
+
   recordUse: (id) => {
+    set((state) => ({
+      useDeltas: { ...state.useDeltas, [id]: (state.useDeltas[id] ?? 0) + 1 },
+    }));
     templateApi.recordUse(id).catch(() => {});
   },
 
@@ -104,5 +137,13 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
     const stored = get().likeStates[id];
     if (stored !== undefined) return stored;
     return { isLiked: fallbackIsLiked, likedCount: fallbackCount };
+  },
+
+  getCounters: (id, baseView, baseUse) => {
+    const { viewDeltas, useDeltas } = get();
+    return {
+      viewCounter: baseView + (viewDeltas[id] ?? 0),
+      usedCounter: baseUse + (useDeltas[id] ?? 0),
+    };
   },
 }));

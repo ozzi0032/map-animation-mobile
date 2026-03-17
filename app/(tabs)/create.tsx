@@ -50,6 +50,9 @@ export default function CreateScreen() {
     loadFeatured,
     pendingPrompt,
     clearPendingPrompt,
+    bumpViewDelta,
+    resetDeltas,
+    useDeltas,
   } = useTemplateStore();
 
   // Form state
@@ -143,6 +146,8 @@ export default function CreateScreen() {
     setFetchingTemplateId(templateId);
     try {
       const detail = await templateApi.getDetail(templateId);
+      resetDeltas(templateId);
+      bumpViewDelta(templateId);
       setModalTemplate(detail);
       setModalVisible(true);
     } catch {
@@ -442,7 +447,7 @@ export default function CreateScreen() {
                             <Text style={styles.templateCardTitle} numberOfLines={2}>
                               {item.title}
                             </Text>
-                            <Text style={styles.templateCardStats}>▶ {item.usedCounter}</Text>
+                            <Text style={styles.templateCardStats}>▶ {item.usedCounter + (useDeltas[item.id] ?? 0)}</Text>
                           </View>
                         </View>
                       </TouchableOpacity>

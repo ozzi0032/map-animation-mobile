@@ -38,7 +38,7 @@ export function TemplateDetailModal({ visible, template, onClose, onUse }: Props
   const [videoError, setVideoError] = useState<string | null>(null);
   const [videoLoading, setVideoLoading] = useState(false);
 
-  const { toggleLike, recordView, getLikeState } = useTemplateStore();
+  const { toggleLike, recordUse, getLikeState, getCounters } = useTemplateStore();
 
   // Reset video state when template changes
   useEffect(() => {
@@ -63,8 +63,6 @@ export function TemplateDetailModal({ visible, template, onClose, onUse }: Props
           useNativeDriver: true,
         }),
       ]).start();
-      // Record view on open (fire-and-forget)
-      if (template) recordView(template.id);
     } else {
       Animated.parallel([
         Animated.timing(slideAnim, {
@@ -83,8 +81,9 @@ export function TemplateDetailModal({ visible, template, onClose, onUse }: Props
 
   const handleUse = useCallback(() => {
     if (!template) return;
+    recordUse(template.id);
     onUse(template.userPrompt, template.id);
-  }, [template, onUse]);
+  }, [template, onUse, recordUse]);
 
   const handleLike = useCallback(() => {
     if (!template) return;
@@ -102,6 +101,12 @@ export function TemplateDetailModal({ visible, template, onClose, onUse }: Props
     template.id,
     template.isLikedByCurrentUser,
     template.likedCounter
+  );
+
+  const { viewCounter, usedCounter } = getCounters(
+    template.id,
+    template.viewCounter,
+    template.usedCounter
   );
 
   return (
@@ -192,8 +197,8 @@ export function TemplateDetailModal({ visible, template, onClose, onUse }: Props
 
             {/* Stats row + like */}
             <View style={styles.statsRow}>
-              <StatPill icon="👁" value={template.viewCounter} />
-              <StatPill icon="▶" value={template.usedCounter} />
+              <StatPill icon="👁" value={viewCounter} />
+              <StatPill icon="▶" value={usedCounter} />
 
               {/* Like pill — interactive */}
               <TouchableOpacity
