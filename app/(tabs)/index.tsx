@@ -153,6 +153,7 @@ export default function TemplatesScreen() {
             ) : (
               <View style={[styles.cardThumb, styles.cardThumbEmpty]}>
                 <Text style={styles.cardThumbEmptyIcon}>🗺️</Text>
+                <Text style={styles.cardThumbEmptyText}>No Preview</Text>
               </View>
             )}
             {/* Badges */}
@@ -411,11 +412,19 @@ const styles = StyleSheet.create({
     height: CARD_WIDTH * 0.62,
   },
   cardThumbEmpty: {
+    height: CARD_WIDTH * 0.62,
     backgroundColor: Colors.surfaceElevated,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 4,
   },
-  cardThumbEmptyIcon: { fontSize: 28 },
+  cardThumbEmptyIcon: { fontSize: 26 },
+  cardThumbEmptyText: {
+    color: Colors.textMuted,
+    fontSize: 10,
+    fontWeight: '500',
+    letterSpacing: 0.2,
+  },
   badgeRow: {
     position: 'absolute',
     top: 6,

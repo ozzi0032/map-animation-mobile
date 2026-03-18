@@ -25,10 +25,10 @@ import { useTemplateStore } from '../../src/store/templateStore';
 import { TemplateDetailModal } from '../../src/components/templates/TemplateDetailModal';
 
 // ─── Constants ───────────────────────────────────────────
-const ASPECT_RATIOS: Array<{ value: string; label: string; desc: string; w: number; h: number }> = [
-  { value: '16:9', label: '16:9', desc: 'Widescreen', w: 40, h: 22 },
-  { value: '9:16', label: '9:16', desc: 'Portrait', w: 22, h: 40 },
-  { value: '1:1',  label: '1:1',  desc: 'Square',    w: 30, h: 30 },
+const ASPECT_RATIOS: Array<{ value: string; label: string }> = [
+  { value: '16:9', label: '16:9' },
+  { value: '9:16', label: '9:16' },
+  { value: '1:1',  label: '1:1'  },
 ];
 
 const FALLBACK_RESOLUTIONS = [
@@ -313,24 +313,14 @@ export default function CreateScreen() {
                 return (
                   <TouchableOpacity
                     key={ar.value}
-                    style={[styles.aspectCard, selected && styles.aspectCardSelected]}
+                    style={[styles.aspectChip, selected && styles.aspectChipSelected]}
                     onPress={() => handleAspectRatioChange(ar.value)}
-                    activeOpacity={0.72}
-                    accessibilityLabel={`${ar.label} ${ar.desc}`}
+                    activeOpacity={0.75}
+                    accessibilityLabel={ar.label}
                     accessibilityState={{ selected }}
                   >
-                    <View
-                      style={[
-                        styles.ratioVisual,
-                        { width: ar.w, height: ar.h },
-                        selected && styles.ratioVisualSelected,
-                      ]}
-                    />
-                    <Text style={[styles.aspectRatioLabel, selected && styles.textAccent]}>
+                    <Text style={[styles.aspectChipLabel, selected && styles.aspectChipLabelSelected]}>
                       {ar.label}
-                    </Text>
-                    <Text style={[styles.aspectRatioDesc, selected && styles.aspectDescSelected]}>
-                      {ar.desc}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -605,50 +595,32 @@ const styles = StyleSheet.create({
   // ── Aspect Ratio ──
   aspectRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 8,
   },
-  aspectCard: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 12,
+  aspectChip: {
+    paddingHorizontal: 15,
+    paddingVertical: 9,
+    borderRadius: 22,
     borderWidth: 1.5,
     borderColor: 'rgba(255,255,255,0.08)',
     backgroundColor: Colors.surfaceElevated,
-    gap: 7,
   },
-  aspectCardSelected: {
+  aspectChipSelected: {
+    backgroundColor: Colors.primary,
     borderColor: Colors.primary,
-    backgroundColor: Colors.primaryDim,
     shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.38,
     shadowRadius: 8,
-    elevation: 3,
+    elevation: 4,
   },
-  ratioVisual: {
-    borderRadius: 3,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.20)',
-  },
-  ratioVisualSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryDim,
-  },
-  aspectRatioLabel: {
+  aspectChipLabel: {
     color: Colors.textSecondary,
     fontSize: 13,
-    fontWeight: '700',
-    letterSpacing: 0.2,
-  },
-  aspectRatioDesc: {
-    color: Colors.textMuted,
-    fontSize: 10,
+    fontWeight: '600',
     letterSpacing: 0.1,
   },
-  textAccent: { color: Colors.primary },
-  aspectDescSelected: { color: Colors.primaryBright + 'AA' },
+  aspectChipLabelSelected: { color: Colors.white },
 
   // ── Resolution ──
   upgradeLink: {
